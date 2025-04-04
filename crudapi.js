@@ -40,6 +40,28 @@ const server = http.createServer((request, response) => {
                 });
             });
         break;
+
+        case "DELETE":
+            request.on("data", info => {
+                const producto_a_eliminar = JSON.parse(info.toString());
+                const nombre = producto_a_eliminar.nombre;
+
+                const index = productos.nombres.indexOf(nombre);
+                if (index !== -1) {
+                    productos.nombres.splice(index, 1);
+
+                    fs.writeFile("./productos.json", JSON.stringify(productos), () => {
+                        response.statusCode = 200;
+                        response.setHeader("Content-Type", "application/json");
+                        response.end(JSON.stringify({ resultado: `${nombre} ha sido eliminado.` }));
+                    });
+                } else {
+                    response.statusCode = 404;
+                    response.setHeader("Content-Type", "application/json");
+                    response.end(JSON.stringify({ error: `Producto ${nombre} no encontrado.` }));
+                }
+            });
+        break;
     }
 
     
